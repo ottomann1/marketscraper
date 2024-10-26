@@ -8,19 +8,15 @@ class BlocketScraper:
         self.search_query = search_query
 
     def fetch_ads(self):
-        # Fetch the HTML content
         response = requests.get(f"{self.BASE_URL}/annonser/hela_sverige?q={self.search_query}")
         soup = BeautifulSoup(response.text, 'html.parser')
-        print(soup)
         
         ads = []
-        # Parse HTML to find ad data
-        for ad in soup.find_all("div", class_="ad-item"):
-            print(ad)
+
+        for ad in soup.find_all("div", class_="styled__Wrapper-sc-1kpvi4z-0 iQpUlz"):
             ads.append({
                 "title": ad.find("h2").text,
-                "price": ad.find("span", class_="price").text if ad.find("span", class_="price") else "N/A",
+                "price": ad.find("div", class_="Price__StyledPrice-sc-1v2maoc-1 lbJRcp").text,
                 "link": self.BASE_URL + ad.find("a")["href"]
             })
-        print(ads)
         return ads
