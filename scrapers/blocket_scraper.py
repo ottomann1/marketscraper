@@ -14,10 +14,16 @@ class BlocketScraper:
         ads = []
 
         for ad in soup.find_all("div", class_="styled__Wrapper-sc-1kpvi4z-0 iQpUlz"):
+            title = ad.find("h2").text
+            price_text = ad.find("div", class_="Price__StyledPrice-sc-1v2maoc-1 lbJRcp").text
+            # Convert price to integer
+            price = int(price_text.replace("kr", "").strip().replace(" ", ""))
+            link = self.BASE_URL + ad.find("h2").find("a")["href"]
+            
             ads.append({
-                "title": ad.find("h2").text,
-                "price": ad.find("div", class_="Price__StyledPrice-sc-1v2maoc-1 lbJRcp").text,
-                "link": self.BASE_URL + ad.find("h2").find("a")["href"]
+                "title": title,
+                "price": price,
+                "link": link
             })
             print(ad, "\n\n\n NEW AD \n\n\n")
         print("ALL ADS BELOW \n\n\n",ads, "\n\n\n ALL ADS ABOVE")
