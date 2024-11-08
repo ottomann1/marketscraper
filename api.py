@@ -4,6 +4,16 @@ from scrapers.blocket_scraper import BlocketScraper
 
 db_handler = DatabaseHandler()
 
+def scrape_ads():
+    ads = []
+    for term in db_handler.get_all_search_terms():
+        blocket_scraper = BlocketScraper(term)
+        blocket_ads = blocket_scraper.fetch_ads()
+        new_ads = db_handler.save_new_ads(blocket_ads)
+        ads.extend(new_ads)
+    db_handler.save_to_csv(ads)
+    return ads
+
 def init_app(app):
     """Initialize all the routes in the Flask app."""
     
@@ -28,14 +38,5 @@ def init_app(app):
 
     @app.route('/scrape', methods=['GET'])
     def scrape():
-        ads = []
-        for term in db_handler.get_all_search_terms():
-            blocket_scraper = BlocketScraper(term)
-            blocket_ads = blocket_scraper.fetch_ads()
-            print(blocket_ads, "\n\n\n blocket ads")
-            new_ads = db_handler.save_new_ads(blocket_ads)
-            print(new_ads, "\n\n\n new ads")
-            ads.extend(new_ads)
-            print(ads)
-        db_handler.save_to_csv(ads)
+        ads = scrape_ads()  # Use the standalone scrape function
         return jsonify({"message": f"Scraped {len(ads)} new ads"}), 200
